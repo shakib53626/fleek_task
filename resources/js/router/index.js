@@ -1,11 +1,13 @@
 import { createWebHistory, createRouter } from 'vue-router'
 import { useAuthStore } from '../stores'
 
-import { HomeView, LoginView } from '../views'
+import { HomeView, LoginView, UserListView } from '../views'
 
 const routes = [
   { path: '/',      name: 'home',  component: HomeView , meta : { title: 'Dashboard',  requiresAuth : true  }},
   { path: '/login', name: 'login', component: LoginView, meta : { title: 'Login Page', guest : true         }},
+
+  { path: '/users', name: 'users', component: UserListView, meta : { title: 'Users List page', requiresAuth : true  }},
 ]
 
 const router = createRouter({
@@ -27,13 +29,13 @@ router.beforeEach((to, from, next) => {
   document.title = to.meta.title || DEFAULT_TITLE;
   const auth = useAuthStore();
 
-  if(to.matched.some((record) => record.meta.requiresAuth)){    
+  if(to.matched.some((record) => record.meta.requiresAuth)){
     if(!auth.getAuthStatus){
         next({name:'login'});
     }else{
         next();
     }
-  }else if(to.matched.some((record) => record.meta.guest)){    
+  }else if(to.matched.some((record) => record.meta.guest)){
       if(auth.getAuthStatus){
           router.push({name : 'home' });
           next({name:'home'});

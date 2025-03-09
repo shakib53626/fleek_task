@@ -52,8 +52,6 @@ const handleLogin = async() => {
         });
 
         if(res?.success){
-            console.log(res);
-
             router.push({name : 'home'});
         }else{
             emailError.value = res?.message;

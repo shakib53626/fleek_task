@@ -27,14 +27,18 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const res = await axiosInstance.post('/login', data);
                 if(res.data?.success){
+
                     this.user = res.data?.result?.user
                     token.setToken(res.data?.result?.token)
                     this.isLoggedIn = true;
                     return res.data;
+
                 }else{
                     return res.data?.message;
                 }
+
             } catch (error) {
+
                 if(error?.response?.data){
                     return error?.response?.data;
                 }
@@ -44,14 +48,17 @@ export const useAuthStore = defineStore('auth', {
         async logout(){
             const token = useTokenStore();
             try {
-                const res = await axiosInstance.post('/admin/logout');
-                if(res.status === 200){
+                const res = await axiosInstance.post('/logout');
+
+                if(res?.data?.success){
                     token.removeToken();
                     this.$reset();
-                    return res;
+                    return res?.data;
                 }
+
             } catch (error) {
-                if(error.response){
+
+                if(error?.response){
                     this.$reset();
                     return error.response;
                 }
