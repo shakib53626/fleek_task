@@ -19,7 +19,7 @@ class Helper
         $response = [
             "success" => true,
             "message" => $message,
-            "data"    => $data,
+            "result"  => $data,
         ];
 
         return response()->json($response, $code);
