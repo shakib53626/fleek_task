@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Classes\Helper;
+use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
 use App\Exceptions\CustomException;
 use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Requests\RegisterRequest;
 
 class AuthController extends Controller
 {
@@ -65,6 +65,18 @@ class AuthController extends Controller
         }catch (\Exception $ex) {
             Log::error($ex->getMessage());
             return Helper::sendError("Something Want Wrong");
+        }
+    }
+
+    public function logout()
+    {
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return Helper::sendResponse(null, "User Logout Successfully", 200);
+
+        } catch (\Exception $ex) {
+            Log::error($ex->getMessage());
+            return Helper::sendError('Something Went Wrong');
         }
     }
 
