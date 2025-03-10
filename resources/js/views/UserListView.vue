@@ -123,6 +123,7 @@ onMounted(() => {
     <div class="overflow-x-auto mt-2">
         <div class="flex justify-between items-center mb-3">
             <h6 class="text-lg font-semibold">All Users List</h6>
+
             <div>
                 <button class="bg-gray-800 text-white px-3 py-1 mx-1.5 rounded text-sm cursor-pointer hover:bg-blue-600" @click="openModal('')">Add</button>
                 <button class="bg-gray-800 text-white px-3 py-1 rounded text-sm cursor-pointer hover:bg-blue-600">Back</button>
@@ -130,6 +131,7 @@ onMounted(() => {
         </div>
 
         <table class="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
+
             <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
                 <tr>
                     <th class="py-3 px-6 text-left">#</th>
@@ -147,7 +149,9 @@ onMounted(() => {
                     <td class="py-4 px-6">{{ data?.name }}</td>
                     <td class="py-4 px-6">{{ data?.email }}</td>
                     <td class="py-4 px-6">{{ data?.role }}</td>
+
                     <td class="py-4 px-6 flex justify-center space-x-2">
+
                         <button class="bg-blue-500 text-white px-3 py-1 rounded text-xs cursor-pointer hover:bg-blue-600" @click="openModal(data)" >Edit</button>
                         <button class="bg-red-500 text-white px-3 py-1 rounded text-xs cursor-pointer hover:bg-red-600" @click="handleDelete(data)">
                             <span v-if="deleteLoading">Loading...</span>

@@ -1,13 +1,14 @@
 import { createWebHistory, createRouter } from 'vue-router'
 import { useAuthStore } from '../stores'
 
-import { HomeView, LoginView, UserListView } from '../views'
+import { HomeView, LoginView, UserListView, CategoryListView } from '../views'
 
 const routes = [
-  { path: '/',      name: 'home',  component: HomeView , meta : { title: 'Dashboard',  requiresAuth : true  }},
-  { path: '/login', name: 'login', component: LoginView, meta : { title: 'Login Page', guest : true         }},
+  { path: '/',           name: 'home',       component: HomeView ,        meta : { title: 'Dashboard',  requiresAuth : true  }},
+  { path: '/login',      name: 'login',      component: LoginView,        meta : { title: 'Login Page', guest : true         }},
 
-  { path: '/users', name: 'users', component: UserListView, meta : { title: 'Users List page', requiresAuth : true  }},
+  { path: '/users',      name: 'users',      component: UserListView,     meta : { title: 'Users List page', requiresAuth : true  }},
+  { path: '/categories', name: 'categories', component: CategoryListView, meta : { title: 'Users List page', requiresAuth : true  }},
 ]
 
 const router = createRouter({
