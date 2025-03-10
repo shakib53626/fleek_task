@@ -10,6 +10,7 @@ const form = ref({
     email: "",
     password: ""
 });
+const loading = ref(false);
 
 const emailError    = ref(null);
 const passwordError = ref(null);
@@ -44,6 +45,7 @@ watch(() => form.value.password, validatePassword);
 const handleLogin = async() => {
     validateEmail();
     validatePassword();
+    loading.value = true;
 
     if (!emailError.value && !passwordError.value) {
         const res = await auth.login({
@@ -53,8 +55,10 @@ const handleLogin = async() => {
 
         if(res?.success){
             router.push({name : 'home'});
+            loading.value = false;
         }else{
             emailError.value = res?.message;
+            loading.value = false;
         }
 
     }
@@ -109,8 +113,12 @@ const handleLogin = async() => {
 
                 <!-- Submit Button -->
                 <div class="flex items-center justify-center">
-                    <button type="submit" class="bg-gradient-to-r cursor-pointer from-blue-500 to-purple-500 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+                    <button type="submit" class="bg-gradient-to-r cursor-pointer from-blue-500 to-purple-500 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline w-full" v-if="!loading">
                         LogIn
+                    </button>
+
+                    <button type="submit" class="bg-gradient-to-r cursor-pointer from-blue-500 to-purple-500 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline w-full" v-else>
+                        Loading . . .
                     </button>
                 </div>
 

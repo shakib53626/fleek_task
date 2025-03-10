@@ -25,6 +25,8 @@ const logout = async() =>{
     const res = await auth.logout();
     if(res?.success){
         router.push({name:'login'});
+    }else{
+        router.push({name:'login'});
     }
 };
 
