@@ -3,7 +3,15 @@
 </script>
 
 <template>
-    <div class="overflow-x-auto mt-5">
+    <div class="overflow-x-auto mt-2">
+        <div class="flex justify-between items-center mb-3">
+            <h6 class="text-lg font-semibold">All Users List</h6>
+            <div>
+                <button class="bg-gray-800 text-white px-3 py-1 mx-1.5 rounded text-sm cursor-pointer hover:bg-blue-600">Add</button>
+                <button class="bg-gray-800 text-white px-3 py-1 rounded text-sm cursor-pointer hover:bg-blue-600">Back</button>
+            </div>
+        </div>
+
         <table class="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
             <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
                 <tr>
@@ -14,6 +22,7 @@
                     <th class="py-3 px-6 text-center">Actions</th>
                 </tr>
             </thead>
+
             <tbody class="text-gray-600 text-sm divide-y divide-gray-200">
                 <tr class="hover:bg-gray-50">
                     <td class="py-4 px-6">1</td>
