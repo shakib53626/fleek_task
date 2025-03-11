@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+use App\Models\User;
 use App\Classes\Helper;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
-use App\Models\User;
-use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -28,9 +28,9 @@ class UserController extends Controller
     public function store(UserStoreRequest $request){
         try {
             $user = new User();
-            $user->name  = $request->name;
-            $user->email = $request->email;
-            $user->role  = $request->role;
+            $user->name     = $request->name;
+            $user->email    = $request->email;
+            $user->role     = $request->role;
             $user->password = Hash::make($request->password);
             $user->save();
 

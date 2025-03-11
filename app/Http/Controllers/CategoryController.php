@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Classes\Helper;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\CategoryStoreRequest;
 use App\Http\Requests\CategoryUpdateRequest;
-use App\Models\Category;
-use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {

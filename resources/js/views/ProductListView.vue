@@ -1,8 +1,9 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
-import { useCategoryStore } from "../stores";
+import { useCategoryStore, useProductStore } from "../stores";
 
 const category = useCategoryStore();
+const product  = useProductStore();
 
 const isOpen        = ref(false);
 const nameError     = ref(null);
@@ -18,10 +19,10 @@ const form          = ref({
 });
 
 const openModal = (data) => {
-    form.value.id       = data?.id ? data?.id : '',
-    form.value.name     = data?.name ? data?.name : '';
-    form.value.status   = data?.status ? data?.status : 'Active';
-    isOpen.value        = true;
+    form.value.id     = data?.id ? data?.id : '',
+    form.value.name   = data?.name ? data?.name : '';
+    form.value.status = data?.status ? data?.status : 'Active';
+    isOpen.value      = true;
 }
 
 
@@ -33,19 +34,19 @@ const validateName = () => {
     }
 };
 
-// ✅ Watcher: Real-time validation
-watch(() => form.value.name, validateName);
+const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/svg+xml"];
 
 const handleImageUpload = (event) => {
     const file = event.target.files[0];
+
     if (file) {
-        if (!file.type.startsWith('image/')) {
-            imageError.value = 'Only image files are allowed';
-            form.value.image = null;
+        if (!allowedTypes.includes(file.type)) {
+            imageError.value   = "Only JPEG, PNG, JPG, GIF, and SVG files are allowed.";
+            form.value.image   = null;
             imagePreview.value = null;
         } else {
-            imageError.value = '';
-            form.value.image = file;
+            imageError.value   = "";
+            form.value.image   = file;
             imagePreview.value = URL.createObjectURL(file);
         }
     }
@@ -54,19 +55,24 @@ const handleImageUpload = (event) => {
 const handleSubmit = async() => {
 
     validateName();
-    loading.value = true;
+        loading.value = true;
+    let api           = '';
 
-    let api = '';
+    let formData = new FormData();
+    formData.append('name', form.value.name );
+    formData.append('status', form.value.status );
+    formData.append('image', form.value.image );
+
     if(form.value?.id){
-        api = `/categories/${form.value?.id}`
+        api = `/products/${form.value?.id}`
     }else{
-        api = 'categories'
+        api = 'products'
     }
 
-    const res = await category.insert(api, form.value);
+    const res = await product.insert(api, formData);
     if(res?.success){
         isOpen.value = false;
-        category.getData();
+        product.getData();
         loading.value = false;
 
     }else{
@@ -77,10 +83,12 @@ const handleSubmit = async() => {
 }
 
 const handleDelete = async(data) =>{
+
     deleteLoading.value = true;
-    const res = await category.destroy(data);
+    const res = await product.destroy(data);
+
     if(res?.success){
-        category.getData();
+        product.getData();
         deleteLoading.value = false;
     }else{
         deleteLoading.value = false;
@@ -88,8 +96,21 @@ const handleDelete = async(data) =>{
 }
 
 onMounted(() => {
+    product.getData();
     category.getData();
 })
+
+// ✅ Watcher: Real-time validation
+watch(() => form.value.name, validateName);
+watch(() => form.value.image, (newImage) => {
+    if (newImage && !allowedTypes.includes(newImage.type)) {
+        imageError.value = "Only JPEG, PNG, JPG, GIF, and SVG files are allowed.";
+        form.value.image = null;
+        imagePreview.value = null;
+    } else {
+        imageError.value = "";
+    }
+});
 </script>
 
 <template>
@@ -106,6 +127,7 @@ onMounted(() => {
             <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
                 <tr>
                     <th class="py-3 px-6 text-left">#</th>
+                    <th class="py-3 px-6 text-left">Image</th>
                     <th class="py-3 px-6 text-left">Name</th>
                     <th class="py-3 px-6 text-left">Status</th>
                     <th class="py-3 px-6 text-center">Actions</th>
@@ -114,8 +136,11 @@ onMounted(() => {
 
             <tbody class="text-gray-600 text-sm divide-y divide-gray-200">
 
-                <tr class="hover:bg-gray-50" v-for="(data, i) in category?.categories" :key="i">
+                <tr class="hover:bg-gray-50" v-for="(data, i) in product?.products" :key="i">
                     <td class="py-4 px-6">{{ i+1 }}</td>
+                    <td class="py-4 px-6">
+                        <img :src="data?.image" width="30" alt="">
+                    </td>
                     <td class="py-4 px-6">{{ data?.name }}</td>
                     <td class="py-4 px-6">{{ data?.status }}</td>
                     <td class="py-4 px-6 flex justify-center space-x-2">
