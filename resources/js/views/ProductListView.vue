@@ -11,6 +11,8 @@ const imageError    = ref('');
 const imagePreview  = ref(null);
 const loading       = ref(false);
 const deleteLoading = ref(false);
+const categories    = ref([]);
+const categoryData  = ref('');
 const form          = ref({
     id    : '',
     name  : '',
@@ -22,9 +24,9 @@ const openModal = (data) => {
     form.value.id     = data?.id ? data?.id : '',
     form.value.name   = data?.name ? data?.name : '';
     form.value.status = data?.status ? data?.status : 'Active';
+    categories.value  = data?.categories;
     isOpen.value      = true;
 }
-
 
 const validateName = () => {
     if (!form.value.name) {
@@ -62,9 +64,17 @@ const handleSubmit = async() => {
     formData.append('name', form.value.name );
     formData.append('status', form.value.status );
     formData.append('image', form.value.image );
+    // formData.append('category_ids[]', categories.value.map(i=> i.id) );
+
+    let i = 0;
+    for (const catId of categories.value) {
+        formData.append(`category_ids[${i}]`, catId.id);
+        i++;
+    }
 
     if(form.value?.id){
         api = `/products/${form.value?.id}`
+        formData.append('_method', 'put');
     }else{
         api = 'products'
     }
@@ -92,6 +102,15 @@ const handleDelete = async(data) =>{
         deleteLoading.value = false;
     }else{
         deleteLoading.value = false;
+    }
+}
+
+const selectCategory = () =>{
+
+    if(categories.value.includes(categoryData.value)){
+        categories.value.splice(categories.value?.findIndex((i)=> i.id == categoryData.value.id), 1);
+    }else{
+        categories.value.push(categoryData.value);
     }
 }
 
@@ -180,6 +199,18 @@ watch(() => form.value.image, (newImage) => {
                             class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
                           <option value="Active">Active</option>
                           <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <span @click="categories.splice(ii, 1)" class="relative me-2 bg-gray-300 p-1 pb-2 pr-6 rounded-md before:content-['x'] before:absolute before:-right-[-5px] before:-top-0.5 before:text-red-500 before:cursor-pointer before:text-2xl" v-for="(tag, ii) in categories" :key="ii">{{ tag?.name }}</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Categories</label>
+                        <select @change="selectCategory" v-model="categoryData" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                          <option value="">Select Categories</option>
+                          <option :value="data" :selected="categories.includes(data)" v-for="(data, ii) in category?.categories" :key="ii">{{ data?.name }}</option>
                         </select>
                     </div>
 

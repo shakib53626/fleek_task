@@ -28,16 +28,9 @@ export const useProductStore = defineStore('product', {
     async insert(api, data){
         try {
 
-            if(data?.id){
-                const res = await axiosInstance.put(api, data);
-                if(res?.data?.success){
-                    return res?.data;
-                }
-            }else{
-                const res = await axiosInstance.post(api, data);
-                if(res?.data?.success){
-                    return res?.data;
-                }
+            const res = await axiosInstance.post(api, data);
+            if(res?.data?.success){
+                return res?.data;
             }
 
         } catch (error) {

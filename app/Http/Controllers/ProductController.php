@@ -15,7 +15,7 @@ class ProductController extends Controller
     public function index()
     {
         try {
-            $products = Product::get();
+            $products = Product::with('categories')->get();
             return Helper::sendResponse($products, "All Product list data");
 
         } catch (Exception $th) {
@@ -44,6 +44,9 @@ class ProductController extends Controller
             }
 
             $product->save();
+            if ($request->has('category_ids') && is_array($request->category_ids)) {
+                $product->categories()->sync($request->category_ids);
+            }
 
             return Helper::sendResponse($product, "Product Created Successfully");
 
@@ -59,7 +62,30 @@ class ProductController extends Controller
             $product = Product::where('id', $id)->first();
             $product->name  = $request->name;
             $product->status = $request->status;
+
+            if ($request->hasFile('image')) {
+
+                $oldImagePath = public_path(str_replace(url('/'), '', $product->image));
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+
+                $image    = $request->file('image');
+                $filename = Str::slug($request->name) . '-' . time() . '.' . $image->getClientOriginalExtension();
+                $folder   = 'uploads/products';
+
+                if (!file_exists(public_path($folder))) {
+                    mkdir(public_path($folder), 0777, true);
+                }
+
+                $image->move(public_path($folder), $filename);
+                $product->image = url("$folder/$filename");
+            }
+
             $product->save();
+            if ($request->has('category_ids') && is_array($request->category_ids)) {
+                $product->categories()->sync($request->category_ids);
+            }
 
             return Helper::sendResponse($product, "Product Updated Successfully");
 
