@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\User;
 use App\Classes\Helper;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UserStoreRequest;
@@ -27,6 +27,8 @@ class UserController extends Controller
 
     public function store(UserStoreRequest $request){
         try {
+            DB::beginTransaction();
+
             $user = new User();
             $user->name     = $request->name;
             $user->email    = $request->email;
@@ -34,9 +36,12 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);
             $user->save();
 
+            DB::commit();
+
             return Helper::sendResponse($user, "User Created Successfully");
 
         } catch (Exception $th) {
+            DB::rollBack();
             Log::error($th->getMessage());
             return Helper::sendError("Something went wrong");
         }

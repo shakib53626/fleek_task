@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Classes\Helper;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\ProductStoreRequest;
 use App\Http\Requests\ProductUpdateRequest;
@@ -33,6 +34,8 @@ class ProductController extends Controller
 
     public function store(ProductStoreRequest $request){
         try {
+            DB::beginTransaction();
+
             $product = new Product();
             $product->name   = $request->name;
             $product->status = $request->status;
@@ -51,6 +54,8 @@ class ProductController extends Controller
             }
 
             $product->save();
+            DB::commit();
+
             if ($request->has('category_ids') && is_array($request->category_ids)) {
                 $product->categories()->sync($request->category_ids);
             }
@@ -58,6 +63,7 @@ class ProductController extends Controller
             return Helper::sendResponse($product, "Product Created Successfully");
 
         } catch (Exception $th) {
+            DB::rollBack();
             Log::error($th->getMessage());
             return Helper::sendError("Something went wrong");
         }

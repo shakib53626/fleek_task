@@ -149,7 +149,7 @@ watch(() => form.value.image, (newImage) => {
         </div>
 
         <div class="mb-2">
-            <input class="w-3xs px-4 py-2 border rounded-lg me-1.5 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Search Product name" v-model="searchKey" @input="searchProduct" type="text">
+            <input class="w-3xs px-4 py-2 border rounded-lg me-1.5 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Filter By Product Name" v-model="searchKey" @input="searchProduct" type="text">
 
             <select v-model="paginateSize" @change="searchProduct" class="w-3xs px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
             <option value="">Sort By Paginate Size</option>
@@ -165,6 +165,7 @@ watch(() => form.value.image, (newImage) => {
                     <th class="py-3 px-6 text-left">#</th>
                     <th class="py-3 px-6 text-left">Image</th>
                     <th class="py-3 px-6 text-left">Name</th>
+                    <th class="py-3 px-6 text-left">Categories (many-to-many)</th>
                     <th class="py-3 px-6 text-left">Status</th>
                     <th class="py-3 px-6 text-center">Actions</th>
                 </tr>
@@ -178,6 +179,9 @@ watch(() => form.value.image, (newImage) => {
                         <img :src="data?.image" width="30" alt="">
                     </td>
                     <td class="py-4 px-6">{{ data?.name }}</td>
+                    <td class="py-4 px-6">
+                        <span class="relative me-2 bg-gray-300 p-1 pb-2 rounded-md" v-for="(tag, ii) in data?.categories" :key="ii">{{ tag?.name }}</span>
+                    </td>
                     <td class="py-4 px-6">{{ data?.status }}</td>
                     <td class="py-4 px-6 flex justify-center space-x-2">
                         <button class="bg-blue-500 text-white px-3 py-1 rounded text-xs cursor-pointer hover:bg-blue-600" @click="openModal(data)" >Edit</button>
