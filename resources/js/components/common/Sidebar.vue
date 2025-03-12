@@ -23,7 +23,7 @@ const logout = async() =>{
                 <div class="bg-gray-900 sm:w-60 min-h-screen w-14 pt-4 transition-all">
 
                     <div class="flex justify-center text-white">
-                        <img class="rounded-full" src="/public/logo.jpg" width="120" alt="">
+                        <img class="rounded-full cursor-pointer" src="/public/logo.jpg" width="120" alt="" @click="router.push({name : 'home'})">
                     </div>
 
                     <ul class="mt-5">
