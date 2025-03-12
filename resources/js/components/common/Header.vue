@@ -1,12 +1,13 @@
 <script setup>
 import Pusher from "pusher-js";
 import { useRouter } from 'vue-router';
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useAuthStore, useNotificationStore, useSettingStore } from '../../stores';
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useAuthStore, useNotificationStore, useSettingStore, useElNotifyStore } from '../../stores';
 
 const router       = useRouter();
 const auth         = useAuthStore();
 const setting      = useSettingStore();
+const elNotify     = useElNotifyStore();
 const notification = useNotificationStore();
 
 const dropdownOpen      = ref(false)
@@ -48,7 +49,7 @@ const logout = async() =>{
 
 onMounted(() => {
     notification?.getData();
-    document.addEventListener('click', handleClickOutside)
+    document.addEventListener('click', handleClickOutside);
 
     Pusher.logToConsole = true;
     const pusher = new Pusher("6ca34b8e8d5c6539e6e2", {
@@ -56,10 +57,19 @@ onMounted(() => {
     });
 
     const channel = pusher.subscribe("notifications");
+
+    // Ensure no duplicate listeners
+    channel.unbind("new-notification");
+
     channel.bind("new-notification", function (data) {
+        elNotify.Success(data?.message?.message);
         notification?.getData();
     });
-})
+});
+
+const unreadCount = computed(() => {
+  return notification?.notifications?.filter(n => !n.is_read).length || 0;
+});
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
@@ -82,10 +92,10 @@ onUnmounted(() => {
               <div class="relative inline-block text-left" ref="dropdownNotifyRef">
                 <!-- Dropdown Button -->
                 <button @click="toggleNotify"
-                  class="inline-flex items-center cursor-pointer w-full justify-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold text-gray-100 shadow-xs  hover:bg-gray-700"
-                  id="menu-button" aria-expanded="true" aria-haspopup="true">
-
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);"><path d="M19 13.586V10c0-3.217-2.185-5.927-5.145-6.742C13.562 2.52 12.846 2 12 2s-1.562.52-1.855 1.258C7.185 4.074 5 6.783 5 10v3.586l-1.707 1.707A.996.996 0 0 0 3 16v2a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-2a.996.996 0 0 0-.293-.707L19 13.586zM19 17H5v-.586l1.707-1.707A.996.996 0 0 0 7 14v-4c0-2.757 2.243-5 5-5s5 2.243 5 5v4c0 .266.105.52.293.707L19 16.414V17zm-7 5a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22z"></path></svg>
+                    class="relative inline-flex items-center cursor-pointer w-full justify-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold text-gray-100 shadow-xs  hover:bg-gray-700"
+                    id="menu-button" aria-expanded="true" aria-haspopup="true">
+                    <span class="absolute top-0 right-0 w-[20px] h-[20px] bg-gray-300 text-gray-900 text-xs leading-5 rounded-full">{{unreadCount}}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);"><path d="M19 13.586V10c0-3.217-2.185-5.927-5.145-6.742C13.562 2.52 12.846 2 12 2s-1.562.52-1.855 1.258C7.185 4.074 5 6.783 5 10v3.586l-1.707 1.707A.996.996 0 0 0 3 16v2a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-2a.996.996 0 0 0-.293-.707L19 13.586zM19 17H5v-.586l1.707-1.707A.996.996 0 0 0 7 14v-4c0-2.757 2.243-5 5-5s5 2.243 5 5v4c0 .266.105.52.293.707L19 16.414V17zm-7 5a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22z"></path></svg>
 
                 </button>
 
