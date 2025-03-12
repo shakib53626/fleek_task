@@ -61,7 +61,7 @@ class ProductController extends Controller
                 $product->categories()->sync($request->category_ids);
             }
 
-            event(new NewNotification($product));
+            // event(new NewNotification($product));
 
             return Helper::sendResponse($product, "Product Created Successfully");
 

@@ -1,24 +1,40 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import Pusher from "pusher-js";
 import { useRouter } from 'vue-router';
-import { useAuthStore, useSettingStore } from '../../stores';
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useAuthStore, useNotificationStore, useSettingStore } from '../../stores';
 
-const setting = useSettingStore();
-const auth    = useAuthStore();
-const router  = useRouter();
+const router       = useRouter();
+const auth         = useAuthStore();
+const setting      = useSettingStore();
+const notification = useNotificationStore();
 
-const dropdownOpen = ref(false)
-const dropdownRef = ref(null)
+const dropdownOpen      = ref(false)
+const notificationOpen  = ref(false);
+const dropdownRef       = ref(null)
+const dropdownNotifyRef = ref(null)
 
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
 }
 
+const toggleNotify = () =>{
+    notificationOpen.value = !notificationOpen.value
+}
+
 // Click outside handler
 const handleClickOutside = (event) => {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
-    dropdownOpen.value = false
+    dropdownOpen.value     = false;
   }
+  if (dropdownNotifyRef.value && !dropdownNotifyRef.value.contains(event.target)) {
+    notificationOpen.value = false;
+  }
+}
+
+const updateNotify = async(id) =>{
+    const res = await notification.update(id);
+    notificationOpen.value = false;
 }
 
 const logout = async() =>{
@@ -31,7 +47,18 @@ const logout = async() =>{
 };
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+    notification?.getData();
+    document.addEventListener('click', handleClickOutside)
+
+    Pusher.logToConsole = true;
+    const pusher = new Pusher("6ca34b8e8d5c6539e6e2", {
+        cluster: "ap2",
+    });
+
+    const channel = pusher.subscribe("notifications");
+    channel.bind("new-notification", function (data) {
+        notification?.getData();
+    });
 })
 
 onUnmounted(() => {
@@ -52,6 +79,33 @@ onUnmounted(() => {
             </div>
 
             <div class="">
+              <div class="relative inline-block text-left" ref="dropdownNotifyRef">
+                <!-- Dropdown Button -->
+                <button @click="toggleNotify"
+                  class="inline-flex items-center cursor-pointer w-full justify-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold text-gray-100 shadow-xs  hover:bg-gray-700"
+                  id="menu-button" aria-expanded="true" aria-haspopup="true">
+
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);"><path d="M19 13.586V10c0-3.217-2.185-5.927-5.145-6.742C13.562 2.52 12.846 2 12 2s-1.562.52-1.855 1.258C7.185 4.074 5 6.783 5 10v3.586l-1.707 1.707A.996.996 0 0 0 3 16v2a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-2a.996.996 0 0 0-.293-.707L19 13.586zM19 17H5v-.586l1.707-1.707A.996.996 0 0 0 7 14v-4c0-2.757 2.243-5 5-5s5 2.243 5 5v4c0 .266.105.52.293.707L19 16.414V17zm-7 5a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22z"></path></svg>
+
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div v-show="notificationOpen" class="absolute p-2.5 right-0 z-10 mt-2 w-64 origin-top-right divide-y divide-gray-600 rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-none">
+                  <div class="py-1">
+                    <h2 class="text-gray-900 font-semibold">Real-time Notifications</h2>
+                    <ul>
+                        <li class="text-gray-700 text-sm border-b last:border-b-0 border-gray-200 p-2"
+                            :class="{'bg-blue-300/20' : !notify?.is_read}"
+                            v-for="(notify, index) in notification?.notifications" :key="index"
+                            @click="router.push({name : notify?.url}), updateNotify(notify?.id)"
+                            style="cursor: pointer;">
+                            {{ notify.message }}
+                        </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
               <div class="relative inline-block text-left" ref="dropdownRef">
                 <!-- Dropdown Button -->
                 <button @click="toggleDropdown"

@@ -1,5 +1,6 @@
 // stores/counter.js
 import { defineStore } from 'pinia'
+import { useNotificationStore } from '.';
 import axiosInstance from '../service/axiosService';
 
 export const useProductStore = defineStore('product', {
@@ -32,10 +33,15 @@ export const useProductStore = defineStore('product', {
     },
 
     async insert(api, data){
+        const notify = useNotificationStore();
         try {
 
             const res = await axiosInstance.post(api, data);
             if(res?.data?.success){
+                notify.insert({
+                    message : `New product added: ${res?.data?.result?.name}! Explore now. 🚀🛍️`,
+                    url : 'products'
+                });
                 return res?.data;
             }
 

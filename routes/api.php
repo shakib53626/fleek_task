@@ -3,9 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -27,6 +28,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('products',         [ProductController::class, 'store' ]);
     Route::put('products/{id}',     [ProductController::class, 'update']);
     Route::delete('products/{id}',  [ProductController::class, 'delete']);
+
+    Route::get('/notifications',        [NotificationController::class, 'index']);
+    Route::post('/notifications',       [NotificationController::class, 'store']);
+    Route::put('/notifications/{id}',   [NotificationController::class, 'update']);
 });
 
 Route::middleware(['auth:api', 'role:admin'])->group(function () {
