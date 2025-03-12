@@ -1,6 +1,7 @@
 <script setup>
 import AuthenticateLayout from './layouts/AuthenticateLayout.vue';
 import GuestLayout from './layouts/GuestLayout.vue'
+import { Notifications } from './components';
 import { useAuthStore } from './stores';
 
 const auth = useAuthStore();
@@ -9,6 +10,7 @@ const auth = useAuthStore();
 <template>
   <div>
     <AuthenticateLayout v-if="auth.isLoggedIn">
+        <Notifications/>
       <RouterView/>
     </AuthenticateLayout>
 

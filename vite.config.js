@@ -15,4 +15,17 @@ export default defineConfig({
             vue: "vue/dist/vue.esm-bundler.js",
         },
     },
+    server: {
+        proxy: {
+          '/pusher': {
+            target: 'http://localhost:6001', // Local WebSocket server URL
+            changeOrigin: true,
+            ws: true, // Enables WebSocket proxying
+          },
+        },
+    },
+    build: {
+        outDir: 'public/build',
+        manifest: true,
+    },
 });

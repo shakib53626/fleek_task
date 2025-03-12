@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Classes\Helper;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Events\NewNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\ProductStoreRequest;
@@ -59,6 +60,8 @@ class ProductController extends Controller
             if ($request->has('category_ids') && is_array($request->category_ids)) {
                 $product->categories()->sync($request->category_ids);
             }
+
+            event(new NewNotification($product));
 
             return Helper::sendResponse($product, "Product Created Successfully");
 
