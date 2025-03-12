@@ -1,9 +1,11 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useCategoryStore, useProductStore } from "../stores";
 
 const category = useCategoryStore();
 const product  = useProductStore();
+const router   = useRouter();
 
 const isOpen        = ref(false);
 const nameError     = ref(null);
@@ -23,10 +25,19 @@ const form          = ref({
 });
 
 const openModal = (data) => {
-    form.value.id     = data?.id ? data?.id : '',
-    form.value.name   = data?.name ? data?.name : '';
-    form.value.status = data?.status ? data?.status : 'Active';
-    categories.value  = data?.categories;
+    form.value.id     = data?.id ? data?.id : '';
+    if(form.value?.id){
+        form.value.name   = data?.name ? data?.name : '';
+        form.value.status = data?.status ? data?.status : 'Active';
+        categories.value  = data?.categories ? data?.categories : [];
+    }else{
+        form.value.name   = '';
+        form.value.status = 'Active';
+        form.value.image  = '';
+        imagePreview.value= '';
+        categories.value  = [];
+        nameError.value   = null;
+    }
     isOpen.value      = true;
 }
 
@@ -109,10 +120,10 @@ const handleDelete = async(data) =>{
 
 const selectCategory = () =>{
 
-    if(categories.value.includes(categoryData.value)){
+    if(categories.value?.includes(categoryData.value)){
         categories.value.splice(categories.value?.findIndex((i)=> i.id == categoryData.value.id), 1);
     }else{
-        categories.value.push(categoryData.value);
+        categories.value?.push(categoryData.value);
     }
 }
 
@@ -144,7 +155,7 @@ watch(() => form.value.image, (newImage) => {
             <h6 class="text-lg font-semibold">All Products List</h6>
             <div>
                 <button class="bg-gray-800 text-white px-3 py-1 mx-1.5 rounded text-sm cursor-pointer hover:bg-blue-600" @click="openModal('')">Add</button>
-                <button class="bg-gray-800 text-white px-3 py-1 rounded text-sm cursor-pointer hover:bg-blue-600">Back</button>
+                <button class="bg-gray-800 text-white px-3 py-1 rounded text-sm cursor-pointer hover:bg-blue-600" @click="router.push({name : 'home'})">Back</button>
             </div>
         </div>
 
@@ -195,7 +206,7 @@ watch(() => form.value.image, (newImage) => {
             </tbody>
         </table>
 
-        <div class="flex items-center justify-center py-10 lg:px-0 sm:px-6 px-4">
+        <div class="flex items-center justify-center py-10 lg:px-0 sm:px-6 px-4" v-if="product?.products?.data?.length > 0">
             <div class="lg:w-3/5 w-full flex items-center justify-between border-t border-gray-200">
                 <!-- Previous Button -->
                 <button
@@ -276,7 +287,7 @@ watch(() => form.value.image, (newImage) => {
                         <label class="block text-gray-700 text-sm font-bold mb-2">Categories</label>
                         <select @change="selectCategory" v-model="categoryData" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
                           <option value="">Select Categories</option>
-                          <option :value="data" :selected="categories.includes(data)" v-for="(data, ii) in category?.categories" :key="ii">{{ data?.name }}</option>
+                          <option :value="data" v-for="(data, ii) in category?.categories" :key="ii">{{ data?.name }}</option>
                         </select>
                     </div>
 
