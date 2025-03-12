@@ -55,6 +55,7 @@ const handleImageUpload = (event) => {
     const file = event.target.files[0];
 
     if (file) {
+
         if (!allowedTypes.includes(file.type)) {
             imageError.value   = "Only JPEG, PNG, JPG, GIF, and SVG files are allowed.";
             form.value.image   = null;
@@ -138,21 +139,13 @@ onMounted(() => {
 
 // ✅ Watcher: Real-time validation
 watch(() => form.value.name, validateName);
-watch(() => form.value.image, (newImage) => {
-    if (newImage && !allowedTypes.includes(newImage.type)) {
-        imageError.value = "Only JPEG, PNG, JPG, GIF, and SVG files are allowed.";
-        form.value.image = null;
-        imagePreview.value = null;
-    } else {
-        imageError.value = "";
-    }
-});
 </script>
 
 <template>
     <div class="overflow-x-auto mt-2">
         <div class="flex justify-between items-center mb-3">
             <h6 class="text-lg font-semibold">All Products List</h6>
+            {{ imageError }}
             <div>
                 <button class="bg-gray-800 text-white px-3 py-1 mx-1.5 rounded text-sm cursor-pointer hover:bg-blue-600" @click="openModal('')">Add</button>
                 <button class="bg-gray-800 text-white px-3 py-1 rounded text-sm cursor-pointer hover:bg-blue-600" @click="router.push({name : 'home'})">Back</button>
