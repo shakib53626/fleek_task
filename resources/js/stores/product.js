@@ -10,9 +10,15 @@ export const useProductStore = defineStore('product', {
 //   persist: true,
 
   actions: {
-    async getData(){
+    async getData(searchKey, page, paginateSize){
         try {
-            const res = await axiosInstance.get('/products');
+            const res = await axiosInstance.get('/products', {
+                params : {
+                    page         : page,
+                    search_key   : searchKey,
+                    paginate_size: paginateSize,
+                }
+            });
             if(res?.data?.success){
                 this.products = res?.data?.result;
             }

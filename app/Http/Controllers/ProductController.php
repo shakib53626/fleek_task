@@ -6,16 +6,23 @@ use Exception;
 use App\Models\Product;
 use App\Classes\Helper;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\ProductStoreRequest;
 use App\Http\Requests\ProductUpdateRequest;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $products = Product::with('categories')->get();
+            $searchKey    = $request->input("search_key", null);
+            $paginateSize = $request->input("paginate_size", 10);
+
+            $products = Product::with('categories')
+            ->when($searchKey, fn ($query) => $query->where("name", "like", "%$searchKey%"))
+            ->paginate($paginateSize);
+
             return Helper::sendResponse($products, "All Product list data");
 
         } catch (Exception $th) {

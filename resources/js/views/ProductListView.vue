@@ -13,6 +13,8 @@ const loading       = ref(false);
 const deleteLoading = ref(false);
 const categories    = ref([]);
 const categoryData  = ref('');
+const searchKey     = ref('');
+const paginateSize  = ref('');
 const form          = ref({
     id    : '',
     name  : '',
@@ -114,8 +116,12 @@ const selectCategory = () =>{
     }
 }
 
+const searchProduct = async(page=1) =>{
+    const res = await product.getData(searchKey.value, page, paginateSize.value);
+}
+
 onMounted(() => {
-    product.getData();
+    searchProduct();
     category.getData();
 })
 
@@ -142,6 +148,17 @@ watch(() => form.value.image, (newImage) => {
             </div>
         </div>
 
+        <div class="mb-2">
+            <input class="w-3xs px-4 py-2 border rounded-lg me-1.5 focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Search Product name" v-model="searchKey" @input="searchProduct" type="text">
+
+            <select v-model="paginateSize" @change="searchProduct" class="w-3xs px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="">Sort By Paginate Size</option>
+            <option value="2">2</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            </select>
+        </div>
+
         <table class="min-w-full bg-white border border-gray-200 shadow-md rounded-lg">
             <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
                 <tr>
@@ -155,7 +172,7 @@ watch(() => form.value.image, (newImage) => {
 
             <tbody class="text-gray-600 text-sm divide-y divide-gray-200">
 
-                <tr class="hover:bg-gray-50" v-for="(data, i) in product?.products" :key="i">
+                <tr class="hover:bg-gray-50" v-for="(data, i) in product?.products?.data" :key="i">
                     <td class="py-4 px-6">{{ i+1 }}</td>
                     <td class="py-4 px-6">
                         <img :src="data?.image" width="30" alt="">
@@ -173,6 +190,51 @@ watch(() => form.value.image, (newImage) => {
 
             </tbody>
         </table>
+
+        <div class="flex items-center justify-center py-10 lg:px-0 sm:px-6 px-4">
+            <div class="lg:w-3/5 w-full flex items-center justify-between border-t border-gray-200">
+                <!-- Previous Button -->
+                <button
+                    :disabled="!product?.products?.prev_page_url"
+                    @click="searchProduct(product?.products?.current_page - 1)"
+                    class="flex items-center pt-3 text-gray-600 hover:text-indigo-700 cursor-pointer"
+                >
+                    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1.1665 4H12.8332" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M1.1665 4L4.49984 7.33333" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M1.1665 4.00002L4.49984 0.666687" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p class="text-sm ml-3 font-medium leading-none">Previous</p>
+                </button>
+
+                <!-- Page Numbers -->
+                <div class="sm:flex hidden">
+                    <button
+                        v-for="page in product?.products?.last_page"
+                        :key="page"
+                        @click="searchProduct(page)"
+                        class="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 hover:border-t hover:border-indigo-400 pt-3 mr-4 px-2"
+                        :class="{ 'text-indigo-700 border-t border-indigo-400': page === product?.products?.current_page }"
+                    >
+                        {{ page }}
+                    </button>
+                </div>
+
+                <!-- Next Button -->
+                <button
+                    :disabled="!product?.products?.next_page_url"
+                    @click="searchProduct(product?.products?.current_page + 1)"
+                    class="flex items-center pt-3 text-gray-600 hover:text-indigo-700 cursor-pointer"
+                >
+                    <p class="text-sm font-medium leading-none mr-3">Next</p>
+                    <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1.1665 4H12.8332" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.5 7.33333L12.8333 4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9.5 0.666687L12.8333 4.00002" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
 
         <!-- Modal -->
         <div v-if="isOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900/50 bg-opacity-50">
