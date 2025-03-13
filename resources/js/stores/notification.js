@@ -25,6 +25,8 @@ export const useNotificationStore = defineStore('notification', {
     },
 
     async insert(data){
+        console.log("Called");
+
         try {
 
             const res = await axiosInstance.post('/notifications', data);

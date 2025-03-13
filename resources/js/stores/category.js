@@ -1,6 +1,7 @@
 // stores/counter.js
 import { defineStore } from 'pinia'
 import axiosInstance from '../service/axiosService';
+import { useNotificationStore } from '.';
 
 export const useCategoryStore = defineStore('category', {
   state: () => ({
@@ -27,7 +28,7 @@ export const useCategoryStore = defineStore('category', {
 
     async insert(api, data){
         try {
-
+            const notify = useNotificationStore();
             if(data?.id){
                 const res = await axiosInstance.put(api, data);
                 if(res?.data?.success){
@@ -36,6 +37,10 @@ export const useCategoryStore = defineStore('category', {
             }else{
                 const res = await axiosInstance.post(api, data);
                 if(res?.data?.success){
+                    notify.insert({
+                        message : `New Category added: ${res?.data?.result?.name}! Explore now. 🚀🛍️`,
+                        url : 'categories'
+                    });
                     return res?.data;
                 }
             }

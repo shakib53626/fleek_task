@@ -68,7 +68,9 @@ onMounted(() => {
 });
 
 const unreadCount = computed(() => {
-  return notification?.notifications?.filter(n => !n.is_read).length || 0;
+  return Array.isArray(notification?.notifications)
+    ? notification.notifications.filter(n => !n.is_read).length
+    : 0;
 });
 
 onUnmounted(() => {
