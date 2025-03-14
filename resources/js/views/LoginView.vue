@@ -7,8 +7,8 @@ const auth   = useAuthStore();
 const router = useRouter();
 
 const form = ref({
-    email: "",
-    password: ""
+    email: "test@example.com",
+    password: "password"
 });
 const loading = ref(false);
 

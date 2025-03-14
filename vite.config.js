@@ -18,14 +18,15 @@ export default defineConfig({
     server: {
         proxy: {
           '/pusher': {
-            target: 'http://localhost:6001', // Local WebSocket server URL
+            target: 'http://localhost:6001',
             changeOrigin: true,
-            ws: true, // Enables WebSocket proxying
+            ws: true,
           },
         },
     },
     build: {
         outDir: 'public/build',
-        manifest: true,
+        assetsDir: '',
+        publicPath: '/build',
     },
 });

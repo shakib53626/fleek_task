@@ -62,8 +62,8 @@ onMounted(() => {
     channel.unbind("new-notification");
 
     channel.bind("new-notification", function (data) {
-        elNotify.Success(data?.message?.message);
         notification?.getData();
+        elNotify.Success(data?.message?.message);
     });
 });
 
